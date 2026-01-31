@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  @apply bg-gray-900 text-white min-h-screen;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+}
+
+/* Glassmorphism utilities */
+.glass {
+  @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl;
+}
+
+.glass-dark {
+  @apply bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-800/50 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-purple-500/50 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-purple-400/70;
+}
+
+/* Severity colors */
+.severity-critical {
+  @apply text-red-400 border-red-500/50 bg-red-500/10;
+}
+
+.severity-high {
+  @apply text-orange-400 border-orange-500/50 bg-orange-500/10;
+}
+
+.severity-medium {
+  @apply text-yellow-400 border-yellow-500/50 bg-yellow-500/10;
+}
+
+.severity-low {
+  @apply text-green-400 border-green-500/50 bg-green-500/10;
+}
+
+/* Animation for progress bars */
+@keyframes slideIn {
+  from {
+    width: 0;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 1s ease-out forwards;
+}
+
+/* Gradient text */
+.gradient-text {
+  @apply bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent;
+}
