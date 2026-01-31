@@ -63,6 +63,22 @@ export default function LandingPage({ onStart }: LandingPageProps) {
             <span>🎯</span> Personalized
           </span>
         </div>
+
+        {/* Privacy details */}
+        <div className="mt-6 max-w-md mx-auto">
+          <div className="glass-dark p-4 rounded-xl">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full" />
+              <span className="text-green-400 text-sm font-medium">100% Private</span>
+            </div>
+            <ul className="text-xs text-gray-500 space-y-1">
+              <li>• No data stored in any database</li>
+              <li>• Screenshots deleted immediately after processing</li>
+              <li>• Results are ephemeral - shown once, not saved</li>
+              <li>• No accounts, no tracking, no analytics</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );
