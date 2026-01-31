@@ -8,11 +8,14 @@ interface UploadStepProps {
 
 export default function UploadStep({ onNext, onDataExtracted }: UploadStepProps) {
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const processFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file.');
+      return;
+    }
 
     setUploading(true);
 
@@ -38,6 +41,41 @@ export default function UploadStep({ onNext, onDataExtracted }: UploadStepProps)
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await processFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'copy';
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      await processFile(files[0]);
+    }
+  };
+
   return (
     <div className="text-center">
       <h2 className="text-3xl font-bold text-white mb-4">
@@ -53,21 +91,33 @@ export default function UploadStep({ onNext, onDataExtracted }: UploadStepProps)
       <div className="mb-6">
         <label
           htmlFor="screenshot-upload"
+          onDragOver={handleDragOver}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
           className={`
             block w-full p-12 border-2 border-dashed rounded-xl cursor-pointer
             transition-all duration-300
             ${uploading
               ? 'border-purple-500 bg-purple-500/20'
-              : 'border-gray-600 hover:border-purple-400 bg-white/5 hover:bg-white/10'
+              : isDragging
+                ? 'border-purple-400 bg-purple-500/30 scale-[1.02] shadow-lg shadow-purple-500/20'
+                : 'border-gray-600 hover:border-purple-400 bg-white/5 hover:bg-white/10'
             }
           `}
         >
-          <div className="text-6xl mb-4">{uploading ? '⏳' : '📱'}</div>
+          <div className="text-6xl mb-4">
+            {uploading ? '⏳' : isDragging ? '📥' : '📱'}
+          </div>
           <div className="text-white font-bold text-lg mb-2">
-            {uploading ? 'Analyzing your screen time...' : 'Click to upload screenshot'}
+            {uploading
+              ? 'Analyzing your screen time...'
+              : isDragging
+                ? 'Drop your screenshot here!'
+                : 'Click to upload screenshot'}
           </div>
           <div className="text-gray-500 text-sm">
-            or drag and drop
+            {isDragging ? 'Release to upload' : 'or drag and drop'}
           </div>
         </label>
         <input
