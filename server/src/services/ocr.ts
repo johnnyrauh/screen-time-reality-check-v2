@@ -1,26 +1,27 @@
 import Anthropic from '@anthropic-ai/sdk';
-import fs from 'fs';
-import path from 'path';
 import { ScreenTimeData } from '../types/index.js';
 
-export async function extractScreenTimeFromImage(imagePath: string): Promise<ScreenTimeData> {
+export async function extractScreenTimeFromBuffer(
+  imageBuffer: Buffer,
+  mimeType: string
+): Promise<ScreenTimeData> {
   const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
   });
 
-  // Read the image file and convert to base64
-  const imageBuffer = fs.readFileSync(imagePath);
+  // Convert buffer to base64
   const base64Image = imageBuffer.toString('base64');
 
-  // Determine media type from file extension
-  const ext = path.extname(imagePath).toLowerCase();
+  // Validate and normalize media type
   let mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' = 'image/png';
-  if (ext === '.jpg' || ext === '.jpeg') {
+  if (mimeType === 'image/jpeg' || mimeType === 'image/jpg') {
     mediaType = 'image/jpeg';
-  } else if (ext === '.gif') {
+  } else if (mimeType === 'image/gif') {
     mediaType = 'image/gif';
-  } else if (ext === '.webp') {
+  } else if (mimeType === 'image/webp') {
     mediaType = 'image/webp';
+  } else if (mimeType === 'image/png') {
+    mediaType = 'image/png';
   }
 
   const message = await anthropic.messages.create({
