@@ -3,6 +3,7 @@ import LandingPage from './components/LandingPage';
 import Questionnaire from './components/Questionnaire';
 import Results from './components/Results';
 import { QuestionnaireData, AnalysisResult } from './types';
+import { API_URL } from './config';
 
 type Page = 'landing' | 'questionnaire' | 'results';
 
@@ -19,7 +20,7 @@ function App() {
     setQuestionnaireData(data);
 
     try {
-      const response = await fetch('/api/analyze', {
+      const response = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

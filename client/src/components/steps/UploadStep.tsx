@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ScreenTimeData } from '../../types';
+import { API_URL } from '../../config';
 
 interface UploadStepProps {
   onNext: () => void;
@@ -23,7 +24,7 @@ export default function UploadStep({ onNext, onDataExtracted }: UploadStepProps)
       const formData = new FormData();
       formData.append('screenshot', file);
 
-      const response = await fetch('/api/ocr', {
+      const response = await fetch(`${API_URL}/api/ocr`, {
         method: 'POST',
         body: formData,
       });
