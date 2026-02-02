@@ -160,18 +160,8 @@ export default function UploadStep({ onNext, onDataExtracted }: UploadStepProps)
         </div>
       )}
 
-      {/* Privacy Badge */}
-      <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/30">
-        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-        <span className="text-green-400 text-sm font-medium">Your data is private</span>
-      </div>
-
-      {/* Privacy Notice */}
-      <div className="mt-4 max-w-md mx-auto text-xs text-gray-500 leading-relaxed">
-        <p>
-          🔒 Your screenshot is processed in real-time and immediately discarded.
-          We don't store any images or personal data. Your results are shown once and not saved.
-        </p>
+      <div className="mt-8 text-xs text-gray-500">
+        🔒 Your screenshot is processed securely and not stored.
       </div>
     </div>
   );
