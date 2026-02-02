@@ -1,3 +1,4 @@
+import { jsPDF } from 'jspdf';
 import { AnalysisResult, QuestionnaireData } from '../types';
 
 interface ResultsProps {
@@ -7,6 +8,203 @@ interface ResultsProps {
 }
 
 export default function Results({ result, data, onStartOver }: ResultsProps) {
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let y = 20;
+
+    // Helper function to add text with word wrap
+    const addWrappedText = (text: string, x: number, maxWidth: number, lineHeight: number = 7) => {
+      const lines = doc.splitTextToSize(text, maxWidth);
+      lines.forEach((line: string) => {
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, x, y);
+        y += lineHeight;
+      });
+    };
+
+    // Title
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Screen Time Reality Check', pageWidth / 2, y, { align: 'center' });
+    y += 15;
+
+    // Big Number
+    doc.setFontSize(36);
+    doc.text(`${result.bigNumber.annualHours.toLocaleString()} hours/year`, pageWidth / 2, y, { align: 'center' });
+    y += 10;
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`That's ${result.bigNumber.annualDays} days of your life`, pageWidth / 2, y, { align: 'center' });
+    y += 5;
+    doc.setFontSize(10);
+    doc.text(result.bigNumber.shockingStat, pageWidth / 2, y, { align: 'center' });
+    y += 15;
+
+    // Time Thieves
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Your Time Thieves', 20, y);
+    y += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+
+    result.impactLeaderboard.forEach((app, index) => {
+      if (y > 260) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${index + 1}. ${app.appName}`, 20, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${app.dailyHours.toFixed(1)}h/day - ${app.severity.toUpperCase()} impact`, 120, y);
+      y += 6;
+      doc.setFontSize(9);
+      addWrappedText(`   ${app.couldHaveDone}`, 20, 170, 5);
+      doc.setFontSize(10);
+      y += 3;
+    });
+    y += 5;
+
+    // Gut Punch
+    if (y > 220) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(result.gutPunch.headline, 20, y);
+    y += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    addWrappedText(result.gutPunch.personalizedMessage, 20, 170);
+    y += 5;
+    doc.setFont('helvetica', 'italic');
+    addWrappedText(`"${result.gutPunch.dreamConnection}"`, 20, 170);
+    y += 10;
+
+    // Pattern Insights
+    if (y > 220) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('What We Noticed', 20, y);
+    y += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+
+    result.patternInsights.forEach((insight) => {
+      if (y > 260) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${insight.badge} ${insight.title}`, 20, y);
+      y += 6;
+      doc.setFont('helvetica', 'normal');
+      addWrappedText(insight.description, 25, 165, 5);
+      y += 3;
+    });
+    y += 5;
+
+    // Opportunity Timeline
+    if (y > 220) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('What You Could Reclaim', 20, y);
+    y += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+
+    result.opportunityTimeline.forEach((milestone) => {
+      doc.text(`${milestone.badge} ${milestone.period}: ${milestone.hoursReclaimed}h - ${milestone.achievement}`, 20, y);
+      y += 7;
+    });
+    y += 5;
+
+    // Reclaim Plan
+    if (y > 180) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Your Reclaim Plan', 20, y);
+    y += 10;
+
+    // Tier 1
+    doc.setFontSize(12);
+    doc.text('Tier 1: Quick Wins', 20, y);
+    y += 7;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    result.reclaimPlan.tier1.forEach((action) => {
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+      addWrappedText(`• ${action.action} (${action.impact})`, 25, 165, 5);
+      y += 2;
+    });
+    y += 5;
+
+    // Tier 2
+    if (y > 240) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Tier 2: Medium Effort', 20, y);
+    y += 7;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    result.reclaimPlan.tier2.forEach((action) => {
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+      addWrappedText(`• ${action.action} (${action.impact})`, 25, 165, 5);
+      y += 2;
+    });
+    y += 5;
+
+    // Tier 3
+    if (y > 240) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Tier 3: Lifestyle Changes', 20, y);
+    y += 7;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    result.reclaimPlan.tier3.forEach((action) => {
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+      addWrappedText(`• ${action.action} (${action.impact})`, 25, 165, 5);
+      y += 2;
+    });
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Generated by Screen Time Reality Check', pageWidth / 2, 285, { align: 'center' });
+
+    // Save the PDF
+    doc.save('screen-time-reality-check.pdf');
+  };
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical': return 'from-red-500 to-red-600';
@@ -254,15 +452,10 @@ export default function Results({ result, data, onStartOver }: ResultsProps) {
               Start Over
             </button>
             <button
-              onClick={() => {
-                // Copy share text to clipboard
-                const shareText = `I just discovered I spend ${result.bigNumber.annualHours.toLocaleString()} hours/year on my phone. That's ${result.bigNumber.annualDays} days. Time for a reality check.`;
-                navigator.clipboard.writeText(shareText);
-                alert('Copied to clipboard!');
-              }}
+              onClick={generatePDF}
               className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium hover:opacity-90"
             >
-              Share My Stats 📤
+              Download Results PDF 📄
             </button>
           </div>
         </section>
