@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { QuestionnaireData, AnalysisResult } from '../types/index.js';
+import { CLAUDE_MODEL } from '../config.js';
 import { createAnalysisPrompt } from '../prompts/analysis.js';
 
 export async function analyzeScreenTime(data: QuestionnaireData): Promise<AnalysisResult> {
@@ -10,8 +11,8 @@ export async function analyzeScreenTime(data: QuestionnaireData): Promise<Analys
   const prompt = createAnalysisPrompt(data);
 
   const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4000,
+    model: CLAUDE_MODEL,
+    max_tokens: 16000,
     messages: [
       {
         role: 'user',
@@ -20,7 +21,8 @@ export async function analyzeScreenTime(data: QuestionnaireData): Promise<Analys
     ],
   });
 
-  const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+  const textBlock = message.content.find((block) => block.type === 'text');
+  const responseText = textBlock && textBlock.type === 'text' ? textBlock.text : '';
 
   // Parse the JSON response from Claude
   try {

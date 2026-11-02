@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { ScreenTimeData } from '../types/index.js';
+import { CLAUDE_MODEL } from '../config.js';
 
 export async function extractScreenTimeFromBuffer(
   imageBuffer: Buffer,
@@ -25,8 +26,8 @@ export async function extractScreenTimeFromBuffer(
   }
 
   const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 1024,
+    model: CLAUDE_MODEL,
+    max_tokens: 8000,
     messages: [
       {
         role: 'user',
@@ -65,7 +66,8 @@ Important:
     ],
   });
 
-  const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+  const textBlock = message.content.find((block) => block.type === 'text');
+  const responseText = textBlock && textBlock.type === 'text' ? textBlock.text : '';
 
   try {
     // Clean up response - remove any markdown formatting if present
